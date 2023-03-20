@@ -15,17 +15,31 @@ function getInput() {
 }
 
 function fireTypingEvent(char, element) {
-    const event = new Event("keypress");
+    return new Promise(resolve => {
+        {
+            const event = new Event("keydown");
 
-    event.shiftKey = char === char.toUpperCase();
-    event.key = char;
-    event.code = `Key${char.toUpperCase()}`;
-    event.which = event.keyCode = String.fromCharCode(char);
-    event.bubbles = true;
+            event.shiftKey = char === char.toUpperCase();
+            event.key = char;
+            event.code = `Key${char.toUpperCase()}`;
+            event.which = event.keyCode = String.fromCharCode(char);
+            event.bubbles = true;
 
-    console.log(event);
+            element.dispatchEvent(event);
+        }
+        setTimeout(() => {
+            const event = new Event("keyup");
 
-    element.dispatchEvent(event);
+            event.shiftKey = char === char.toUpperCase();
+            event.key = char;
+            event.code = `Key${char.toUpperCase()}`;
+            event.which = event.keyCode = String.fromCharCode(char);
+            event.bubbles = true;
+
+            element.dispatchEvent(event);
+        }, 100);
+        setTimeout(resolve, 250);
+    });
 }
 
 function getTextOfQuestion() {
@@ -100,8 +114,9 @@ async function answerForMe() {
 
         if (textInput) {
             textInput.focus();
-            textInput.setAttribute("value", answers[0].slice(0, -1));
-            alert(`Add a(n) ${answers[0][answers[0].length - 1]} to the end of the input (TextInput EMCA issue)`);
+
+            textInput.value = answers[0];
+            textInput.textContent = answers[0];
         } else {
             answers.forEach(answer => findAndClick("div", answer));
         }
